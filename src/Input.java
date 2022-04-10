@@ -18,13 +18,13 @@ public class Input {
     }
 
     /**
-     * Vrati Arraylist ISpaceObject ktery nacte z csv souboru
+     * Vrati Arraylist ASpaceObject ktery nacte z csv souboru
      * a ulozi co atributu tridy gConstant a step udaje z první radky
-     * @return Arraylist ISpaceObject
+     * @return Arraylist ASpaceObject
      */
-    public ArrayList<ISpaceObject> getInput(){
+    public ArrayList<ASpaceObject> getInput(){
 
-        ArrayList<ISpaceObject> input = new ArrayList<ISpaceObject>();
+        ArrayList<ASpaceObject> input = new ArrayList<ASpaceObject>();
         String line;
 
         try {

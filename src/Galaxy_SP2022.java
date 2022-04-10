@@ -18,7 +18,7 @@ public class Galaxy_SP2022 {
 
 
 
-		ArrayList<ISpaceObject> spaceObjects = input.getInput();
+		ArrayList<ASpaceObject> spaceObjects = input.getInput();
 		double gConstant = input.getgConstant();
 		double step = input.getStep();
 		input = null;

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class DrawingPanel extends JPanel {
 
-    private ArrayList<ISpaceObject> spaceObjects;
+    private ArrayList<ASpaceObject> spaceObjects;
     private ArrayList<Ellipse2D> spaceObjectsHitbox;
     private Graphics2D g2;
 
@@ -21,7 +21,7 @@ public class DrawingPanel extends JPanel {
     double x_min, x_max, y_min, y_max;
     double world_width, world_height;
 
-    public DrawingPanel(ArrayList<ISpaceObject> spaceObjects, double gConstant, double step) {
+    public DrawingPanel(ArrayList<ASpaceObject> spaceObjects, double gConstant, double step) {
         this.setPreferredSize(new Dimension(800, 600));
         this.spaceObjects = spaceObjects;
         this.gConsatnt = gConstant;
@@ -72,7 +72,7 @@ public class DrawingPanel extends JPanel {
         y_min = Double.MAX_VALUE;
         y_max = 0;
 
-        for (ISpaceObject spaceObject : spaceObjects) {
+        for (ASpaceObject spaceObject : spaceObjects) {
 
             /*
             if (spaceObject.getPosX() + spaceObject.getr() > x_max) {
@@ -111,7 +111,7 @@ public class DrawingPanel extends JPanel {
      */
     private void drawObjects(Graphics2D g2){
 
-        for (ISpaceObject sO : spaceObjects) {
+        for (ASpaceObject sO : spaceObjects) {
 
             Ellipse2D.Double hitbox = new Ellipse2D.Double(sO.getPosX() - sO.getr() -x_min, sO.getPosY() - sO.getr() - y_min, sO.getr()*2, sO.getr()*2);
 
@@ -134,7 +134,7 @@ public class DrawingPanel extends JPanel {
     private void drawObjectInfo(Graphics2D g2){
 
 
-        for(ISpaceObject spaceObject : spaceObjects) {
+        for(ASpaceObject spaceObject : spaceObjects) {
             if (spaceObject.isClicked()) {
 
                 g2.setTransform(old);
@@ -216,7 +216,7 @@ public class DrawingPanel extends JPanel {
 
             //calculateCurrentA();
 
-            for (ISpaceObject spaceObject : spaceObjects) {
+            for (ASpaceObject spaceObject : spaceObjects) {
 
                 calculateCurrentA();
 
@@ -253,7 +253,7 @@ public class DrawingPanel extends JPanel {
         double hitX = ((x - this.getWidth() / 2.0) / scale) + world_width/2;
         double hitY = ((y - this.getHeight() / 2.0) / scale) + world_height/2;
 
-        for(ISpaceObject spaceObject : spaceObjects){
+        for(ASpaceObject spaceObject : spaceObjects){
 
             Ellipse2D elipsa = new Ellipse2D.Double(spaceObject.getPosX() - spaceObject.getr() - x_min, spaceObject.getPosY() - spaceObject.getr() - y_min, spaceObject.getr()*2, spaceObject.getr()*2);
 
