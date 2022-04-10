@@ -1,4 +1,6 @@
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -64,6 +66,19 @@ public class Galaxy_SP2022 {
 
 			@Override
 			public void mouseExited(MouseEvent e) {}
+		});
+
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+			@Override
+			public boolean dispatchKeyEvent(KeyEvent e) {
+
+				if (e.getID() == KeyEvent.KEY_PRESSED
+						&& e.getKeyChar() == ' ') {
+					panel.isSpaceBarPressed();
+				}
+
+				return false;
+			}
 		});
 
 

@@ -15,6 +15,7 @@ public class DrawingPanel extends JPanel {
     private double gConsatnt;
     private double step;
     private double simulationTime = 1.343536363434340;
+    private boolean timeIsRunning = false;
 
     double scale;
 
@@ -61,8 +62,9 @@ public class DrawingPanel extends JPanel {
         drawObjectInfo(g2);
         drawSimulationTime(g2);
 
-        updateSystem();
-
+        if(timeIsRunning) {
+            updateSystem();
+        }
     }
 
     private void setScale(){
@@ -180,7 +182,9 @@ public class DrawingPanel extends JPanel {
             double zlomeky = 0;
 
             for(int j = 0; j < spaceObjects.size(); j++){
+
                 if(i != j) {
+
                     vector1 = (spaceObjects.get(i).getPosX() - spaceObjects.get(j).getPosX()) * (spaceObjects.get(i).getPosX() - spaceObjects.get(j).getPosX());
                     vector2 = (spaceObjects.get(i).getPosY() - spaceObjects.get(j).getPosY()) * (spaceObjects.get(i).getPosY() - spaceObjects.get(j).getPosY());
                     jmenovatel = (Math.sqrt(vector1 + vector2)) * (Math.sqrt(vector1 + vector2)) * (Math.sqrt(vector1 + vector2));
@@ -192,10 +196,9 @@ public class DrawingPanel extends JPanel {
                 }
 
             }
+
             spaceObjects.get(i).setaX(zlomekx * gConsatnt);
-            //System.out.println("ax: " + zlomekx * gConsatnt);
             spaceObjects.get(i).setaY(zlomeky * gConsatnt);
-            //System.out.println("ay: " +zlomeky * gConsatnt);
 
         }
     }
@@ -209,8 +212,6 @@ public class DrawingPanel extends JPanel {
         double velocityX, velocityY;
 
         while (t > 0) {
-
-            //System.out.println(t);
 
             double deltaT = Math.min(t,deltaT_min);
 
@@ -265,5 +266,16 @@ public class DrawingPanel extends JPanel {
             }
         }
 
+    }
+
+    public void isSpaceBarPressed(){
+
+        System.out.println("xd");
+
+        if(timeIsRunning) {
+            timeIsRunning = false;
+            return;
+        }
+        timeIsRunning = true;
     }
 }
