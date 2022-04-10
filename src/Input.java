@@ -4,17 +4,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * Sprostredkuje vstup ze souboru
+ * Ze souboru nacte udaje pro simulaci a vytvori pole spaceObjectu
  * @author Mikulas Mach
  */
 public class Input {
-    private String file;
 
+    /** Cesta ke k souboru se vstupnimi daty*/
+    private String file;
+    /** Gravitacni konstanta*/
     private double gConstant;
+    /** Krok simulace*/
     private double step;
 
-    public Input(String fileName){
-        this.file = fileName;
+    /**
+     * Konstruktor priradi hodnoty atributum a vypocita polomer spaceObjectu
+     * @param filePath cesta k souboru se vstupnimi daty
+     */
+    public Input(String filePath){
+        this.file = filePath;
     }
 
     /**
@@ -62,10 +69,18 @@ public class Input {
         return input;
     }
 
+    /**
+     * Getter
+     * @return double gConstant - Gravitacni konstanta simulace
+     */
     public double getgConstant() {
         return gConstant;
     }
 
+    /**
+     * Getter
+     * @return double step - Krok simulace
+     */
     public double getStep() {
         return step;
     }
