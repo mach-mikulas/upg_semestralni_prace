@@ -6,7 +6,6 @@ import java.util.ArrayList;
 public class DrawingPanel extends JPanel {
 
     private ArrayList<ASpaceObject> spaceObjects;
-    private ArrayList<Ellipse2D> spaceObjectsHitbox;
     private Graphics2D g2;
 
     private AffineTransform old;
@@ -14,8 +13,12 @@ public class DrawingPanel extends JPanel {
 
     private double gConsatnt;
     private double step;
-    private double simulationTime = 1.343536363434340;
-    private boolean timeIsRunning = false;
+    public double simulationTimeStart;
+    public double simulationTime = 0;
+    public double simulationTimeStopped = 0;
+    public double simulationTimeStoppedStart = 0;
+    public double timeLastUpdate = 0;
+    public boolean timeIsRunning = true;
 
     double scale;
 
@@ -35,7 +38,6 @@ public class DrawingPanel extends JPanel {
 
         g2 = (Graphics2D) g;
 
-        spaceObjectsHitbox = new ArrayList<Ellipse2D>();
 
         setScale();
         double scale_x = this.getWidth() / world_width;
@@ -62,9 +64,6 @@ public class DrawingPanel extends JPanel {
         drawObjectInfo(g2);
         drawSimulationTime(g2);
 
-        if(timeIsRunning) {
-            updateSystem();
-        }
     }
 
     private void setScale(){
@@ -75,21 +74,6 @@ public class DrawingPanel extends JPanel {
         y_max = 0;
 
         for (ASpaceObject spaceObject : spaceObjects) {
-
-            /*
-            if (spaceObject.getPosX() + spaceObject.getr() > x_max) {
-                x_max = spaceObject.getPosX() + spaceObject.getr();
-            }
-            if (spaceObject.getPosY() + spaceObject.getr() > y_max) {
-                y_max = spaceObject.getPosY() + spaceObject.getr();
-            }
-            if (spaceObject.getPosX() - spaceObject.getr() < x_min) {
-                x_min = spaceObject.getPosX() + spaceObject.getr();
-            }
-            if (spaceObject.getPosY() - spaceObject.getr() < y_min) {
-                y_min = spaceObject.getPosY() + spaceObject.getr();
-            }
-            */
 
             double left = spaceObject.getPosX() - spaceObject.getr();
             double right = spaceObject.getPosX() + spaceObject.getr();
@@ -164,7 +148,8 @@ public class DrawingPanel extends JPanel {
         g2.setFont(new Font("TimesRoman", Font.BOLD, 15));
         g2.setColor(Color.BLACK);
 
-        g2.drawString(String.format("Simulation Time: %.3fms", simulationTime), this.getWidth()-195, 15);
+
+        g2.drawString(String.format("Simulation time: %.3fs", (simulationTime/1000.0)*step), this.getWidth()-195, 15);
 
         g2.setTransform(scaled);
     }
@@ -203,11 +188,9 @@ public class DrawingPanel extends JPanel {
         }
     }
 
-    private void updateSystem() {
+    public void updateSystem(double t) {
 
-
-        double deltaT_min = 0.02;//step / 10;
-        double t = 0.1;
+        double deltaT_min = step / 10000;
 
         double velocityX, velocityY;
 
@@ -215,11 +198,9 @@ public class DrawingPanel extends JPanel {
 
             double deltaT = Math.min(t,deltaT_min);
 
-            //calculateCurrentA();
+            calculateCurrentA();
 
             for (ASpaceObject spaceObject : spaceObjects) {
-
-                calculateCurrentA();
 
                 velocityX = (deltaT / 2) * spaceObject.getaX();
                 spaceObject.setVelX(spaceObject.getVelX() + velocityX);
@@ -229,8 +210,6 @@ public class DrawingPanel extends JPanel {
 
                 spaceObject.setPosX(spaceObject.getPosX() + (deltaT * spaceObject.getVelX()));
                 spaceObject.setPosY(spaceObject.getPosY() + (deltaT * spaceObject.getVelY()));
-
-                calculateCurrentA();
 
                 velocityX = (deltaT / 2) * spaceObject.getaX();
                 spaceObject.setVelX(spaceObject.getVelX() + velocityX);
@@ -249,16 +228,14 @@ public class DrawingPanel extends JPanel {
      */
     public void objectHit(double x, double y){
 
-        g2.setTransform(scaled);
-
-        double hitX = ((x - this.getWidth() / 2.0) / scale) + world_width/2;
-        double hitY = ((y - this.getHeight() / 2.0) / scale) + world_height/2;
+        double testX = ((x - this.getWidth() / 2.0) / scale) + world_width/2;
+        double testY = ((y - this.getHeight() / 2.0) / scale) + world_height/2;
 
         for(ASpaceObject spaceObject : spaceObjects){
 
             Ellipse2D elipsa = new Ellipse2D.Double(spaceObject.getPosX() - spaceObject.getr() - x_min, spaceObject.getPosY() - spaceObject.getr() - y_min, spaceObject.getr()*2, spaceObject.getr()*2);
 
-            if(elipsa.contains(hitX, hitY)){
+            if(elipsa.contains(testX, testY)){
                 spaceObject.setClicked(true);
             }
             else {
@@ -274,8 +251,10 @@ public class DrawingPanel extends JPanel {
 
         if(timeIsRunning) {
             timeIsRunning = false;
+            simulationTimeStoppedStart = System.currentTimeMillis();
             return;
         }
+        simulationTimeStopped = System.currentTimeMillis() - simulationTimeStart - timeLastUpdate;
         timeIsRunning = true;
     }
 }

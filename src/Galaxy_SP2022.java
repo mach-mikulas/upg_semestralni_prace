@@ -38,6 +38,9 @@ public class Galaxy_SP2022 {
 
 		okno.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		okno.setLocationRelativeTo(null); //vycentrovat na obrazovce
+
+		panel.simulationTimeStart = System.currentTimeMillis();
+
 		okno.setVisible(true);
 
 
@@ -83,12 +86,19 @@ public class Galaxy_SP2022 {
 
 
 
-
 		java.util.Timer tm = new Timer();
 		tm.schedule(new TimerTask() {
 						@Override
 						public void run() {
 							panel.repaint();
+
+							if(panel.timeIsRunning){
+								panel.simulationTime = System.currentTimeMillis() - panel.simulationTimeStart - panel.simulationTimeStopped;
+
+								double t = ((panel.simulationTime) - panel.timeLastUpdate) / 1000.0;
+								panel.updateSystem(t * step);
+								panel.timeLastUpdate = panel.simulationTime;
+							}
 						}
 					}, 0, 20 //50x za sekundu
 		);
