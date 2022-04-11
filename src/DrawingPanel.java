@@ -17,7 +17,7 @@ public class DrawingPanel extends JPanel {
     public double simulationTime = 0;
     public double simulationTimeStopped = 0;
     public double simulationTimeStoppedStart = 0;
-    public double timeLastUpdate = 0;
+    public double simulationTimeBefore = 0;
     public boolean timeIsRunning = true;
 
     double scale;
@@ -198,7 +198,7 @@ public class DrawingPanel extends JPanel {
 
             double deltaT = Math.min(t,deltaT_min);
 
-            calculateCurrentA();
+            //calculateCurrentA();
 
             for (ASpaceObject spaceObject : spaceObjects) {
 
@@ -210,6 +210,8 @@ public class DrawingPanel extends JPanel {
 
                 spaceObject.setPosX(spaceObject.getPosX() + (deltaT * spaceObject.getVelX()));
                 spaceObject.setPosY(spaceObject.getPosY() + (deltaT * spaceObject.getVelY()));
+
+                calculateCurrentA();
 
                 velocityX = (deltaT / 2) * spaceObject.getaX();
                 spaceObject.setVelX(spaceObject.getVelX() + velocityX);
@@ -254,7 +256,7 @@ public class DrawingPanel extends JPanel {
             simulationTimeStoppedStart = System.currentTimeMillis();
             return;
         }
-        simulationTimeStopped = System.currentTimeMillis() - simulationTimeStart - timeLastUpdate;
+        simulationTimeStopped = System.currentTimeMillis() - simulationTimeStart - simulationTimeBefore;
         timeIsRunning = true;
     }
 }

@@ -95,9 +95,9 @@ public class Galaxy_SP2022 {
 							if(panel.timeIsRunning){
 								panel.simulationTime = System.currentTimeMillis() - panel.simulationTimeStart - panel.simulationTimeStopped;
 
-								double t = ((panel.simulationTime) - panel.timeLastUpdate) / 1000.0;
+								double t = ((panel.simulationTime) - panel.simulationTimeBefore) / 1000.0;
 								panel.updateSystem(t * step);
-								panel.timeLastUpdate = panel.simulationTime;
+								panel.simulationTimeBefore = panel.simulationTime;
 							}
 						}
 					}, 0, 20 //50x za sekundu
