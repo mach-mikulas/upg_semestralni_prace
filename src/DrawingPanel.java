@@ -1,43 +1,41 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.*;
-import java.util.ArrayList;
 
+/**
+ * Trida provadi vykreslovani aktualniho stavu simulace
+ * @author Mikulas Mach
+ */
 public class DrawingPanel extends JPanel {
 
-    private ArrayList<ASpaceObject> spaceObjects;
-    private Graphics2D g2;
+    private ASpaceObject[] spaceObjects;
+    private final double step;
+    private double scale;
+
+    private double x_min, x_max, y_min, y_max, world_width, world_height;
 
     private AffineTransform old;
     private AffineTransform scaled;
 
-    private double gConsatnt;
-    private double step;
-    public double simulationTimeStart;
-    public double simulationTime = 0;
-    public double simulationTimeStopped = 0;
-    public double simulationTimeStoppedStart = 0;
-    public double simulationTimeBefore = 0;
-    public boolean timeIsRunning = true;
-
-    double scale;
-
-    double x_min, x_max, y_min, y_max;
-    double world_width, world_height;
-
-    public DrawingPanel(ArrayList<ASpaceObject> spaceObjects, double gConstant, double step) {
+    /**
+     * Konstruktor priradi hodnoty atributum
+     * @param spaceObjects pole vsech spaceObjectu
+     * @param step krok simulace
+     */
+    public DrawingPanel(ASpaceObject[] spaceObjects, double step) {
         this.setPreferredSize(new Dimension(800, 600));
         this.spaceObjects = spaceObjects;
-        this.gConsatnt = gConstant;
         this.step = step;
     }
 
+    /**
+     * Nastavi aktualni scale a vola metody ktere zajisti vykresleni
+     */
     @Override
     public void paint(Graphics g){
         super.paint(g);
 
-        g2 = (Graphics2D) g;
-
+        Graphics2D g2 = (Graphics2D) g;
 
         setScale();
         double scale_x = this.getWidth() / world_width;
@@ -52,20 +50,21 @@ public class DrawingPanel extends JPanel {
 
         scaled = g2.getTransform();
 
-        g2.setColor(Color.GRAY);
-        Rectangle2D rec = new Rectangle2D.Double(0,0, world_width, world_height);
-        g2.fill(rec);
+        //g2.setColor(Color.GRAY);
+        //Rectangle2D rec = new Rectangle2D.Double(0,0, world_width, world_height);
+        //g2.fill(rec);
 
         g2.setColor(Color.BLUE);
         drawObjects(g2);
 
-
-        g2.setTransform(old);
         drawObjectInfo(g2);
         drawSimulationTime(g2);
 
     }
 
+    /**
+     * Aktualizuje minimalni a maximalni souradnici X a Y vesmiru
+     */
     private void setScale(){
 
         x_min = Double.MAX_VALUE;
@@ -85,7 +84,6 @@ public class DrawingPanel extends JPanel {
             y_min = Math.min(up, y_min);
             y_max = Math.max(down,y_max);
 
-
         }
 
         world_width = x_max - x_min;
@@ -93,13 +91,25 @@ public class DrawingPanel extends JPanel {
     }
 
     /**
-     * Vykresli vsechny space objecty
+     * Vykresli vsechny spaceObjecty
      */
     private void drawObjects(Graphics2D g2){
 
         for (ASpaceObject sO : spaceObjects) {
 
-            Ellipse2D.Double hitbox = new Ellipse2D.Double(sO.getPosX() - sO.getr() -x_min, sO.getPosY() - sO.getr() - y_min, sO.getr()*2, sO.getr()*2);
+            sO.calculateR(sO.getWeight());
+
+            //if(sO.getr() > 1e5){
+            //   sO.setr(3e10);
+            //}
+
+            if(sO.getr() < (world_width /72.0 * 0.2) * 2){
+                sO.setr((world_width /72.0 * 0.2) * 2);
+            }
+
+
+
+            Ellipse2D.Double elipsa = new Ellipse2D.Double(sO.getPosX() - sO.getr() -x_min, sO.getPosY() - sO.getr() - y_min, sO.getr()*2, sO.getr()*2);
 
             if(sO.isClicked()){
                 g2.setColor(Color.RED);
@@ -108,17 +118,16 @@ public class DrawingPanel extends JPanel {
                 g2.setColor(Color.BLUE);
 
             }
-            g2.fill(hitbox);
+            g2.fill(elipsa);
 
         }
 
     }
 
     /**
-     * Zobrazi do okna informace o vybranem space objectu
+     * Zobrazi do okna informace o vybranem spaceObjectu a zvyrazni ho
      */
     private void drawObjectInfo(Graphics2D g2){
-
 
         for(ASpaceObject spaceObject : spaceObjects) {
             if (spaceObject.isClicked()) {
@@ -138,9 +147,8 @@ public class DrawingPanel extends JPanel {
         }
     }
 
-
     /**
-     * Do praveho horniho rohu vypise cas simulace
+     * Do praveho horniho rohu vypise aktualni cas simulace
      */
     private void drawSimulationTime(Graphics2D g2){
         g2.setTransform(old);
@@ -148,85 +156,15 @@ public class DrawingPanel extends JPanel {
         g2.setFont(new Font("TimesRoman", Font.BOLD, 15));
         g2.setColor(Color.BLACK);
 
+        String simTime = String.format("Simulation time: %.3fs", (Calculations.simulationTime/1000.0)*step);
 
-        g2.drawString(String.format("Simulation time: %.3fs", (simulationTime/1000.0)*step), this.getWidth()-195, 15);
+        g2.drawString(simTime, this.getWidth() - g2.getFontMetrics().stringWidth(simTime), 15);
 
         g2.setTransform(scaled);
     }
 
     /**
-     * Vypocte aktualni zrychleni space objectu
-     */
-    private void calculateCurrentA(){
-
-        double vector1, vector2, jmenovatel, citatelx, citately;
-
-        for(int i = 0; i < spaceObjects.size(); i++){
-
-            double zlomekx = 0;
-            double zlomeky = 0;
-
-            for(int j = 0; j < spaceObjects.size(); j++){
-
-                if(i != j) {
-
-                    vector1 = (spaceObjects.get(i).getPosX() - spaceObjects.get(j).getPosX()) * (spaceObjects.get(i).getPosX() - spaceObjects.get(j).getPosX());
-                    vector2 = (spaceObjects.get(i).getPosY() - spaceObjects.get(j).getPosY()) * (spaceObjects.get(i).getPosY() - spaceObjects.get(j).getPosY());
-                    jmenovatel = (Math.sqrt(vector1 + vector2)) * (Math.sqrt(vector1 + vector2)) * (Math.sqrt(vector1 + vector2));
-                    citatelx = spaceObjects.get(j).getPosX() - spaceObjects.get(i).getPosX();
-                    citately = spaceObjects.get(j).getPosY() - spaceObjects.get(i).getPosY();
-
-                    zlomekx += (citatelx/jmenovatel)*spaceObjects.get(j).getWeight();
-                    zlomeky += (citately/jmenovatel)*spaceObjects.get(j).getWeight();
-                }
-
-            }
-
-            spaceObjects.get(i).setaX(zlomekx * gConsatnt);
-            spaceObjects.get(i).setaY(zlomeky * gConsatnt);
-
-        }
-    }
-
-    public void updateSystem(double t) {
-
-        double deltaT_min = step / 10000;
-
-        double velocityX, velocityY;
-
-        while (t > 0) {
-
-            double deltaT = Math.min(t,deltaT_min);
-
-            //calculateCurrentA();
-
-            for (ASpaceObject spaceObject : spaceObjects) {
-
-                velocityX = (deltaT / 2) * spaceObject.getaX();
-                spaceObject.setVelX(spaceObject.getVelX() + velocityX);
-
-                velocityY = (deltaT / 2) * spaceObject.getaY();
-                spaceObject.setVelY(spaceObject.getVelY() + velocityY);
-
-                spaceObject.setPosX(spaceObject.getPosX() + (deltaT * spaceObject.getVelX()));
-                spaceObject.setPosY(spaceObject.getPosY() + (deltaT * spaceObject.getVelY()));
-
-                calculateCurrentA();
-
-                velocityX = (deltaT / 2) * spaceObject.getaX();
-                spaceObject.setVelX(spaceObject.getVelX() + velocityX);
-
-                velocityY = (deltaT / 2) * spaceObject.getaY();
-                spaceObject.setVelY(spaceObject.getVelY() + velocityY);
-            }
-
-            t = t - deltaT;
-        }
-
-    }
-
-    /**
-     * Metoda kontrolujici zda bylo kliknuto na space object
+     * Metoda kontrolujici zda bylo kliknuto na spaceObject
      */
     public void objectHit(double x, double y){
 
@@ -235,9 +173,9 @@ public class DrawingPanel extends JPanel {
 
         for(ASpaceObject spaceObject : spaceObjects){
 
-            Ellipse2D elipsa = new Ellipse2D.Double(spaceObject.getPosX() - spaceObject.getr() - x_min, spaceObject.getPosY() - spaceObject.getr() - y_min, spaceObject.getr()*2, spaceObject.getr()*2);
+            Ellipse2D hitbox = new Ellipse2D.Double(spaceObject.getPosX() - spaceObject.getr() - x_min, spaceObject.getPosY() - spaceObject.getr() - y_min, spaceObject.getr()*2, spaceObject.getr()*2);
 
-            if(elipsa.contains(testX, testY)){
+            if(hitbox.contains(testX, testY)){
                 spaceObject.setClicked(true);
             }
             else {
@@ -245,18 +183,5 @@ public class DrawingPanel extends JPanel {
             }
         }
 
-    }
-
-    public void isSpaceBarPressed(){
-
-        System.out.println("xd");
-
-        if(timeIsRunning) {
-            timeIsRunning = false;
-            simulationTimeStoppedStart = System.currentTimeMillis();
-            return;
-        }
-        simulationTimeStopped = System.currentTimeMillis() - simulationTimeStart - simulationTimeBefore;
-        timeIsRunning = true;
     }
 }

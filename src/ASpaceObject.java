@@ -5,7 +5,7 @@
 public abstract class ASpaceObject {
 
     /** Jmeno spaceObjectu*/
-    private String name;
+    private final String name;
     /** Pozice X spaceObjectu*/
     private double posX;
     /** Pozice Y spaceObjectu*/
@@ -26,7 +26,7 @@ public abstract class ASpaceObject {
     private double aY;
 
     /**
-     * Konstruktor priradi hodnoty atributum a vypocita polomer spaceObjectu
+     * Konstruktor priradi hodnoty atributum
      * @param name jmeno
      * @param posX pozice X
      * @param posY pozice Y
@@ -41,7 +41,6 @@ public abstract class ASpaceObject {
         this.velY = velY;
         this.weight = weight;
         this.clicked = false;
-        this.r = (Math.cbrt(6*weight/Math.PI))/2;
     }
 
     /**
@@ -178,5 +177,21 @@ public abstract class ASpaceObject {
      */
     public void setaY(double aY) {
         this.aY = aY;
+    }
+
+    /**
+     * Setter
+     * @param r - zmeni polomer spaceObjectu
+     */
+    public void setr(double r) {
+        this.r = r;
+    }
+
+    /**
+     * Vypocita aktualni polomer spaceObjectu
+     * @param weight - aktualni hmostnost spaceObjectu
+     */
+    public void calculateR(double weight){
+        this.r = (Math.cbrt(6*weight/Math.PI))/2;
     }
 }

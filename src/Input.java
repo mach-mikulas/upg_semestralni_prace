@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class Input {
 
     /** Cesta ke k souboru se vstupnimi daty*/
-    private String file;
+    private final String file;
     /** Gravitacni konstanta*/
     private double gConstant;
     /** Krok simulace*/
@@ -25,13 +25,14 @@ public class Input {
     }
 
     /**
-     * Vrati Arraylist ASpaceObject ktery nacte z csv souboru
+     * Vrati pole ASpaceObject ktery nacte z csv souboru
      * a ulozi co atributu tridy gConstant a step udaje z první radky
      * @return Arraylist ASpaceObject
      */
-    public ArrayList<ASpaceObject> getInput(){
+    public ASpaceObject[] getInput(){
 
-        ArrayList<ASpaceObject> input = new ArrayList<ASpaceObject>();
+        ArrayList<ASpaceObject> input = new ArrayList<>();
+        ASpaceObject[] result;
         String line;
 
         try {
@@ -66,7 +67,24 @@ public class Input {
             e.printStackTrace();
             System.exit(1);
         }
-        return input;
+
+        result = new ASpaceObject[input.size()];
+        result = input.toArray(result);
+
+
+        for(ASpaceObject spaceObject : result){
+            if(spaceObject.getr() > 1E5){
+                System.out.println("xd hhaaa");
+                for(ASpaceObject spaceObject1 : result){
+                    spaceObject1.setr(10);
+                }
+                break;
+            }
+        }
+
+
+
+        return result;
     }
 
     /**
