@@ -70,7 +70,7 @@ public class Calculations {
     /** Prepocitava rychlosti a zrychleni spaceObjectu*/
     public void updateSystem(double t) {
 
-        double deltaT_min = (step * spaceObjects.length) / 10000;
+        double deltaT_min = spaceObjects.length *  step / 10000;
 
         double velocityX, velocityY;
 
@@ -90,8 +90,6 @@ public class Calculations {
 
                 spaceObject.setPosX(spaceObject.getPosX() + (deltaT * spaceObject.getVelX()));
                 spaceObject.setPosY(spaceObject.getPosY() + (deltaT * spaceObject.getVelY()));
-
-                //calculateCurrentA();
 
                 velocityX = (deltaT / 2) * spaceObject.getaX();
                 spaceObject.setVelX(spaceObject.getVelX() + velocityX);

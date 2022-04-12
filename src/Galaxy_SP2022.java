@@ -6,14 +6,18 @@ import java.awt.event.MouseListener;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * Hlavni trida obsahujici main
+ * @author Mikulas Mach
+ */
 public class Galaxy_SP2022 {
 
 	public static void main(String[] args) {
 
-		//Input input = new Input(args[0]);
+		Input input = new Input(args[0]);
 
 		//Input input = new Input("data/collision.csv");
-		Input input = new Input("data/negative.csv");
+		//Input input = new Input("data/negative.csv");
 		//Input input = new Input("data/pulsar.csv");
 		//Input input = new Input("data/random100.csv");
 		//Input input = new Input("data/random500.csv");

@@ -50,10 +50,6 @@ public class DrawingPanel extends JPanel {
 
         scaled = g2.getTransform();
 
-        //g2.setColor(Color.GRAY);
-        //Rectangle2D rec = new Rectangle2D.Double(0,0, world_width, world_height);
-        //g2.fill(rec);
-
         g2.setColor(Color.BLUE);
         drawObjects(g2);
 
@@ -92,6 +88,7 @@ public class DrawingPanel extends JPanel {
 
     /**
      * Vykresli vsechny spaceObjecty
+     * Kontroluje, zda neni nejaka planeta mensi nez 3px, pokud ano tak zmeni vykreslovaci polomer na 3px
      */
     private void drawObjects(Graphics2D g2){
 
@@ -99,17 +96,16 @@ public class DrawingPanel extends JPanel {
 
             sO.calculateR(sO.getWeight());
 
-            //if(sO.getr() > 1e5){
-            //   sO.setr(3e10);
-            //}
+            Ellipse2D.Double elipsa;
 
-            if(sO.getr() < (world_width /72.0 * 0.2) * 2){
-                sO.setr((world_width /72.0 * 0.2) * 2);
+            //Prevede polomer SpaceObjectu na prumer v px a zkontroluje zda je vetsí nez 3px
+            //Pokud je mensi tak nastavi zobrazovaci polomer na 3px
+            if(2*sO.getr()*scale < 3){
+                elipsa = new Ellipse2D.Double(sO.getPosX() - (3/scale) -x_min, sO.getPosY() - (3/scale) - y_min, (3/scale)*2, (3/scale)*2);
+            }else {
+                elipsa = new Ellipse2D.Double(sO.getPosX() - sO.getr() -x_min, sO.getPosY() - sO.getr() - y_min, sO.getr()*2, sO.getr()*2);
             }
 
-
-
-            Ellipse2D.Double elipsa = new Ellipse2D.Double(sO.getPosX() - sO.getr() -x_min, sO.getPosY() - sO.getr() - y_min, sO.getr()*2, sO.getr()*2);
 
             if(sO.isClicked()){
                 g2.setColor(Color.RED);
@@ -121,7 +117,6 @@ public class DrawingPanel extends JPanel {
             g2.fill(elipsa);
 
         }
-
     }
 
     /**
@@ -173,7 +168,15 @@ public class DrawingPanel extends JPanel {
 
         for(ASpaceObject spaceObject : spaceObjects){
 
-            Ellipse2D hitbox = new Ellipse2D.Double(spaceObject.getPosX() - spaceObject.getr() - x_min, spaceObject.getPosY() - spaceObject.getr() - y_min, spaceObject.getr()*2, spaceObject.getr()*2);
+            Ellipse2D hitbox;
+
+            //Prevede polomer SpaceObjectu na prumer v px a zkontroluje zda je vetsí nez 3px
+            //Pokud je mensi tak nastavi zobrazovaci polomer na 3px
+            if(2*spaceObject.getr()*scale < 3){
+                hitbox = new Ellipse2D.Double(spaceObject.getPosX() - (3/scale) -x_min, spaceObject.getPosY() - (3/scale) - y_min, (3/scale)*2, (3/scale)*2);
+            }else {
+                hitbox = new Ellipse2D.Double(spaceObject.getPosX() - spaceObject.getr() -x_min, spaceObject.getPosY() - spaceObject.getr() - y_min, spaceObject.getr()*2, spaceObject.getr()*2);
+            }
 
             if(hitbox.contains(testX, testY)){
                 spaceObject.setClicked(true);
@@ -182,6 +185,5 @@ public class DrawingPanel extends JPanel {
                 spaceObject.setClicked(false);
             }
         }
-
     }
 }

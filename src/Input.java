@@ -26,8 +26,8 @@ public class Input {
 
     /**
      * Vrati pole ASpaceObject ktery nacte z csv souboru
-     * a ulozi co atributu tridy gConstant a step udaje z první radky
-     * @return Arraylist ASpaceObject
+     * a ulozi do atributu tridy gConstant a step udaje z prvni radky
+     * @return  ASpaceObject[]
      */
     public ASpaceObject[] getInput(){
 
