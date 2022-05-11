@@ -1,8 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -17,6 +17,7 @@ public class Galaxy_SP2022 {
 		Input input = new Input(args[0]);
 
 		//Input input = new Input("data/collision.csv");
+		//Input input = new Input("data/test.csv");
 		//Input input = new Input("data/negative.csv");
 		//Input input = new Input("data/pulsar.csv");
 		//Input input = new Input("data/random100.csv");
@@ -48,23 +49,18 @@ public class Galaxy_SP2022 {
 
 		okno.setVisible(true);
 
-		panel.addMouseListener(new MouseListener() {
-			@Override
-			public void mouseClicked(MouseEvent e) {}
-
+		panel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				panel.objectHit(e.getX(),e.getY());
+
+				if(SwingUtilities.isLeftMouseButton(e)){
+					panel.objectHit(e.getX(),e.getY(), 0);
+				}
+
+				if(SwingUtilities.isRightMouseButton(e)){
+					panel.objectHit(e.getX(),e.getY(), 1);
+				}
 			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {}
-
-			@Override
-			public void mouseExited(MouseEvent e) {}
 		});
 
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {

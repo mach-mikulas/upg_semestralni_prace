@@ -1,3 +1,5 @@
+import java.util.TreeMap;
+
 /**
  * Abstrakni trida udavajisi strukturu spaceobjectu
  * @author Mikulas Mach
@@ -24,6 +26,10 @@ public abstract class ASpaceObject {
     private double aX;
     /** zrychleni Y spaceObjectu*/
     private double aY;
+    /** TreeMap obsahujici data grafu (cas a rychlost)*/
+    private TreeMap<Long, Double> graphData = new TreeMap<>();
+    /** Treemap obsahujici jesnotlive body trajektorie a cas jejich pridani*/
+    public TreeMap<Long, double[]> trajectory = new TreeMap<>();
 
     /**
      * Konstruktor priradi hodnoty atributum
@@ -115,6 +121,10 @@ public abstract class ASpaceObject {
         return r;
     }
 
+    public TreeMap<Long, Double> getGraphData(){
+        return graphData;
+    }
+
     /**
      * Getter
      * @return boolean clicked - zda byl dany spaceObject kliknut
@@ -194,4 +204,46 @@ public abstract class ASpaceObject {
     public void calculateR(double weight){
         this.r = (Math.cbrt(6*weight/Math.PI))/2;
     }
+
+    /**
+     * Do TreeMapy prida jako klic aktualni cas a jako hodnotu rychlost spaceObjectu v km/h
+     * Pokud je rozdil mezi prvnim a poslednim zaznamem vice  jak 30s, smaze se prvni
+     * @param velocityX rychlost X spaceObjectu
+     * @param velocityY rychlost Y spaceObjectu
+     */
+    public void addGraphData(double velocityX, double velocityY){
+        double velocity = Math.sqrt(velocityX * velocityX + velocityY * velocityY) * 3.6;
+
+        long realTime = (System.currentTimeMillis() - Calculations.simulationTimeStart);
+
+        long stopTime = 30000;
+
+        graphData.put(realTime, velocity);
+
+        if(graphData.lastKey() - graphData.firstKey() > stopTime){
+            graphData.pollFirstEntry();
+        }
+
+    }
+
+    /**
+     * Do TreeMapy prida jako klic aktualni realny cas a jako hodnotu pole obsahujici x a y
+     * Pokud rozdil mezi prvni a poslednim zaznamem v TreeMape je vetsi jak 1s, smaze se prvni
+     * @param x souradnice X jednoho bodu trajektorie
+     * @param y souradnice Y jednoho bodu trajektorie
+     */
+    public void addTrajectory(double x, double y){
+        long timeToRemove = 1000;
+
+        long realTime = System.currentTimeMillis() - Calculations.simulationTimeStart;
+        double[] input = {x,y};
+
+        trajectory.put(realTime, input);
+
+        if(graphData.lastKey() - graphData.firstKey() > timeToRemove){
+            trajectory.pollFirstEntry();
+        }
+    }
 }
+
+

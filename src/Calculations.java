@@ -1,15 +1,16 @@
+
 /**
  * Trida provadi vsechny vypocty, ktere nepotrebuji instanci {@link DrawingPanel}
  * @author Mikulas Mach
  */
 public class Calculations {
 
-    private ASpaceObject[] spaceObjects;
+    private static ASpaceObject[] spaceObjects;
     private final double gConstant;
     private final double step;
 
     /** systemovi cas startu simulace*/
-    public double simulationTimeStart;
+    public static long simulationTimeStart;
     /** aktualni cas simulace*/
     public static double simulationTime = 0;
     /** cas trvani stopnuti simulace*/
@@ -17,7 +18,7 @@ public class Calculations {
     /** cas simulace v predchozim kroku*/
     public double simulationTimeBefore = 0;
     /** urcuje zda simulace bezi nebo je stopnuta*/
-    public boolean timeIsRunning = true;
+    public static boolean timeIsRunning = true;
 
     /**
      * Konstruktor priradi hodnoty atributum
@@ -96,10 +97,13 @@ public class Calculations {
 
                 velocityY = (deltaT / 2) * spaceObject.getaY();
                 spaceObject.setVelY(spaceObject.getVelY() + velocityY);
+
             }
 
             t = t - deltaT;
         }
+
+
 
     }
 
@@ -115,5 +119,65 @@ public class Calculations {
         simulationTimeStopped = System.currentTimeMillis() - simulationTimeStart - simulationTimeBefore;
         timeIsRunning = true;
     }
+
+    /**
+     * Funkce vypocte zda doslo ke kolizi
+     * Pokud dojde ke kolizi, vytvori nove pole do ktereho vlozi vznikly object a vynecha objecty ktere se ucastnili kolize
+     * @param object spaceObject u ktereho kontrolujeme zda se nesrazil s ostatnima
+     * @return pokud doslo ke kolizi vrati true
+     */
+    public static boolean calculateCollision(ASpaceObject object){
+
+        double objectX = object.getPosX();
+        double objectY = object.getPosY();
+        double objectR = object.getr();
+        double objectWeight = object.getWeight();
+
+        for(int i = 0; i < spaceObjects.length; i++){
+            if(spaceObjects[i] != object){
+
+                double distanceX = (spaceObjects[i].getPosX() - objectX) * (spaceObjects[i].getPosX() - objectX);
+                double distanceY = (spaceObjects[i].getPosY() - objectY) * (spaceObjects[i].getPosY() - objectY);
+                double distance = Math.sqrt(distanceX + distanceY);
+
+                if(distance < objectR + spaceObjects[i].getr()){
+
+                    ASpaceObject[] newSpaceObjects = new ASpaceObject[spaceObjects.length-1];
+
+                    double newX = (objectX + spaceObjects[i].getPosX())/2;
+                    double newY = (objectY + spaceObjects[i].getPosY())/2;
+
+                    double newVelX = ((objectWeight * object.getVelX()) + (spaceObjects[i].getWeight() * spaceObjects[i].getVelX())) / (objectWeight + spaceObjects[i].getWeight());
+                    double newVelY = ((objectWeight * object.getVelY()) + (spaceObjects[i].getWeight() * spaceObjects[i].getVelY())) / (objectWeight + spaceObjects[i].getWeight());
+
+                    ASpaceObject newCollision = new Planet("newCollision", newX, newY, newVelX, newVelY, objectWeight + spaceObjects[i].getWeight());
+
+                    int j = 0;
+                    for (ASpaceObject spaceObject: spaceObjects) {
+                        if(spaceObject != spaceObjects[i] && spaceObject != object){
+                            newSpaceObjects[j] = spaceObject;
+                            j++;
+                        }
+                    }
+
+                    newSpaceObjects[j] = newCollision;
+
+                    spaceObjects = newSpaceObjects;
+
+                    DrawingPanel.setSpaceObjects(newSpaceObjects);
+
+                    return true;
+
+                }
+
+
+
+            }
+        }
+
+        return false;
+    }
+
+
 
 }
